@@ -3,10 +3,10 @@ import styled from "styled-components";
 
 const PostContainer = styled.div`
   border: 1px solid #ddd;
-  margin-bottom: 1rem;
   border-radius: 8px;
   overflow: hidden;
   background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const PostHeader = styled.div`
@@ -32,10 +32,14 @@ const Username = styled.div`
 const PostImage = styled.img`
   width: 100%;
   height: auto;
+  display: block;
 `;
 
 const PostCaption = styled.div`
-  padding: 1rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+  color: #333;
 `;
 
 const CommentsSection = styled.div`
@@ -56,6 +60,20 @@ const Comment = styled.div`
   margin-top: 0.5rem;
   padding: 0.5rem;
   border-bottom: 1px solid #ddd;
+`;
+
+const SubmitButton = styled.button`
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  margin-top: 0.5rem;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const Post = ({ username, imageUrl, caption, comments = [] }) => {
@@ -99,7 +117,7 @@ const Post = ({ username, imageUrl, caption, comments = [] }) => {
             onChange={handleCommentChange}
             placeholder="Add a comment..."
           />
-          <button type="submit">Post</button>
+          <SubmitButton type="submit">Post</SubmitButton>
         </form>
       </CommentsSection>
     </PostContainer>

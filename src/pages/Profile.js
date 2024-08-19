@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import EditProfileModal from './EditProfileModal';
+import Post from '../components/Post'; // Adjust path if necessary
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -17,35 +19,12 @@ const ProfileHeader = styled.div`
   margin-bottom: 2rem;
 `;
 
-const ProfileImageContainer = styled.div`
-  position: relative;
-`;
-
 const ProfileImage = styled.img`
   width: 100px;
   height: 100px;
   border-radius: 50%;
   margin-right: 1rem;
   object-fit: cover;
-`;
-
-const EditProfileImage = styled.label`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background-color: #007bff;
-  color: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-  input {
-    display: none;
-  }
 `;
 
 const ProfileInfo = styled.div`
@@ -119,71 +98,78 @@ const PostsGrid = styled.div`
   width: 100%;
 `;
 
-const PostItem = styled.div`
-  background-color: #ddd;
-  height: 150px;
-  border-radius: 8px;
-  overflow: hidden;
+const UploadPostButton = styled.button`
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
-const PostImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+const EditProfileButton = styled.button`
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
-const ReelsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 1rem;
-  max-width: 800px;
-  width: 100%;
-`;
 
-const ReelItem = styled.div`
-  background-color: #ddd;
-  height: 120px; /* Slightly smaller than post items */
-  border-radius: 8px;
-  overflow: hidden;
-`;
-
-const ReelImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+const UploadInput = styled.input`
+  display: none;
 `;
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState('https://via.placeholder.com/100');
-  const [showPosts, setShowPosts] = useState(false); // Default to showing reels
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [profileData, setProfileData] = useState({
     username: '_username_',
     bio: 'Just another tech enthusiast. Loves coding and coffee!',
-    posts: [
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150',
-      // Add more post URLs as needed
-    ],
-    reels: [
-      'https://via.placeholder.com/100x150',
-      'https://via.placeholder.com/100x150',
-      'https://via.placeholder.com/100x150',
-      // Add more reel URLs as needed
-    ],
+    posts: [], // Start with an empty array
     stats: {
-      posts: 3,
-      followers: 10,
-      following: 5,
+      posts: 0,
+      followers: 0,
+      following: 0,
     },
   });
 
-  const handleImageUpload = (e) => {
+  const toggleEditProfileModal = () => {
+    setIsEditProfileOpen(!isEditProfileOpen);
+  };
+
+  const handleProfileUpdate = (updatedData) => {
+    setProfileData(updatedData);
+  };
+
+  const handlePostUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result);
+        const newPost = reader.result;
+        const caption = prompt('Enter a caption for your post:'); // Ask for caption
+        setProfileData(prevState => ({
+          ...prevState,
+          posts: [
+            ...prevState.posts,
+            { imageUrl: newPost, caption: caption || '' }
+          ],
+          stats: {
+            ...prevState.stats,
+            posts: prevState.stats.posts + 1,
+          }
+        }));
       };
       reader.readAsDataURL(file);
     }
@@ -192,13 +178,7 @@ const Profile = () => {
   return (
     <ProfileContainer>
       <ProfileHeader>
-        <ProfileImageContainer>
-          <ProfileImage src={profileImage} alt="Profile" />
-          <EditProfileImage>
-            <input type="file" accept="image/*" onChange={handleImageUpload} />
-            📷
-          </EditProfileImage>
-        </ProfileImageContainer>
+        <ProfileImage src={profileImage} alt="Profile" />
         <ProfileInfo>
           <Username>{profileData.username}</Username>
           <Bio>{profileData.bio}</Bio>
@@ -217,40 +197,38 @@ const Profile = () => {
             </Stat>
           </StatsContainer>
         </ProfileInfo>
+        <EditProfileButton onClick={toggleEditProfileModal}>Edit Profile</EditProfileButton>
       </ProfileHeader>
-      <ButtonContainer>
-        <ToggleButton
-          active={!showPosts}
-          onClick={() => setShowPosts(false)}
-        >
-          Reels
-        </ToggleButton>
-        <ToggleButton
-          active={showPosts}
-          onClick={() => setShowPosts(true)}
-        >
-          Posts
-        </ToggleButton>
-      </ButtonContainer>
+      <UploadPostButton as="label" htmlFor="upload-post">
+        Upload Post
+        <UploadInput
+          id="upload-post"
+          type="file"
+          accept="image/*"
+          onChange={handlePostUpload}
+        />
+      </UploadPostButton>
       <ContentContainer>
-        {!showPosts ? (
-          <ReelsContainer>
-            {profileData.reels.map((reel, index) => (
-              <ReelItem key={index}>
-                <ReelImage src={reel} alt={`Reel ${index + 1}`} />
-              </ReelItem>
-            ))}
-          </ReelsContainer>
-        ) : (
-          <PostsGrid>
-            {profileData.posts.map((post, index) => (
-              <PostItem key={index}>
-                <PostImage src={post} alt={`Post ${index + 1}`} />
-              </PostItem>
-            ))}
-          </PostsGrid>
-        )}
+        <PostsGrid>
+          {profileData.posts.map((post, index) => (
+            <Post
+              key={index}
+              username={profileData.username}
+              imageUrl={post.imageUrl}
+              caption={post.caption}
+            />
+          ))}
+        </PostsGrid>
       </ContentContainer>
+      {isEditProfileOpen && (
+        <EditProfileModal
+          profileData={profileData}
+          onClose={toggleEditProfileModal}
+          onUpdate={handleProfileUpdate}
+          profileImage={profileImage}
+          setProfileImage={setProfileImage}
+        />
+      )}
     </ProfileContainer>
   );
 };
