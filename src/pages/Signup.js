@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { signup } from "../redux/reducers/authReducer";
+import { useNavigate } from "react-router-dom";
 import { signup as signupApi } from "../services/api";
+import { signup } from "../redux/reducers/authReducer";
 import styled from "styled-components";
 
 const SignupContainer = styled.div`
@@ -48,13 +49,14 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Use useNavigate for programmatic navigation
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await signupApi({ username, email, password });
       dispatch(signup(response.data));
-      // Redirect to home or profile
+      navigate('/profile'); // Redirect to profile page after successful signup
     } catch (error) {
       console.error(error);
     }

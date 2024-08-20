@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import EditProfileModal from './EditProfileModal';
-import Post from '../components/Post'; // Adjust path if necessary
+import Post from '../components/Post';
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -63,25 +64,6 @@ const StatLabel = styled.span`
   color: #666;
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const ToggleButton = styled.button`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: ${props => props.active ? '#007bff' : '#ddd'};
-  color: ${props => props.active ? 'white' : 'black'};
-  
-  &:hover {
-    background-color: ${props => props.active ? '#0056b3' : '#ccc'};
-  }
-`;
-
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -131,18 +113,10 @@ const UploadInput = styled.input`
 `;
 
 const Profile = () => {
-  const [profileImage, setProfileImage] = useState('https://via.placeholder.com/100');
+  const { user } = useSelector((state) => state.auth); // Access user data from Redux store
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [profileData, setProfileData] = useState({
-    username: '_username_',
-    bio: 'Just another tech enthusiast. Loves coding and coffee!',
-    posts: [], // Start with an empty array
-    stats: {
-      posts: 0,
-      followers: 0,
-      following: 0,
-    },
-  });
+  const [profileImage, setProfileImage] = useState(user?.profileImage || 'https://via.placeholder.com/100');
+  const [profileData, setProfileData] = useState(user || {});
 
   const toggleEditProfileModal = () => {
     setIsEditProfileOpen(!isEditProfileOpen);
@@ -184,15 +158,15 @@ const Profile = () => {
           <Bio>{profileData.bio}</Bio>
           <StatsContainer>
             <Stat>
-              <StatValue>{profileData.stats.posts}</StatValue>
+              <StatValue>{profileData.stats?.posts || 0}</StatValue>
               <StatLabel>Posts</StatLabel>
             </Stat>
             <Stat>
-              <StatValue>{profileData.stats.followers}</StatValue>
+              <StatValue>{profileData.stats?.followers || 0}</StatValue>
               <StatLabel>Followers</StatLabel>
             </Stat>
             <Stat>
-              <StatValue>{profileData.stats.following}</StatValue>
+              <StatValue>{profileData.stats?.following || 0}</StatValue>
               <StatLabel>Following</StatLabel>
             </Stat>
           </StatsContainer>
@@ -210,7 +184,7 @@ const Profile = () => {
       </UploadPostButton>
       <ContentContainer>
         <PostsGrid>
-          {profileData.posts.map((post, index) => (
+          {profileData.posts?.map((post, index) => (
             <Post
               key={index}
               username={profileData.username}

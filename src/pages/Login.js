@@ -53,7 +53,7 @@ const Login = () => {
     try {
       const response = await loginApi({ email, password });
       dispatch(login(response.data));
-      // Redirect to home or profile
+      // Redirect to profile page or home
     } catch (error) {
       console.error(error);
     }

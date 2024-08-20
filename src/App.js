@@ -10,6 +10,7 @@ import Events from "./pages/Events";
 import Groups from "./pages/Groups";
 import JobBoard from "./pages/JobBoard";
 import QA from "./pages/QA";
+import Admin from "./Admin/Admin";
 import Navbar from "./components/Navbar";
 import styled from 'styled-components';
 
@@ -41,6 +42,7 @@ function App() {
           <Route path="/job-board" element={<JobBoard />} />
           <Route path="/qa" element={<QA />} />
           <Route path="/more" element={<More />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </MainContent>
     </Router>
